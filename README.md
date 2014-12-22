@@ -21,3 +21,4 @@ Caveats
 Dependencies
 ------------
 pyserial
+jsonpickle
