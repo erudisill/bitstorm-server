@@ -1,0 +1,15 @@
+{
+    "py/object": "settings.Settings", 
+    "cpSerial": {
+        "py/object": "cpSerial.CpSerialSettings", 
+        "parity": "N", 
+        "baudrate": 38400, 
+        "bytesize": 8, 
+        "xonxoff": 0, 
+        "rtscts": 0, 
+        "timeout": 0, 
+        "stopbits": 1, 
+        "port": "/dev/cu.usbserial-FTWKWI5W"
+    }, 
+    "filename": ""
+}
