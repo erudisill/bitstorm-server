@@ -80,7 +80,7 @@ class CpSerialService(threading.Thread):
                 self.received_bytes = self.received_bytes + len(data)
                 if self._putData:
                     # send new copy of data
-                    self._putData(CpSerialBytes(data))
+                    self._putData(bytearray(data))
             
             #time.sleep(0.005)
                     
