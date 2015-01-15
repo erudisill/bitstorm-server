@@ -9,7 +9,8 @@
         "rtscts": 0, 
         "timeout": 0, 
         "stopbits": 1, 
-        "port": "/dev/cu.usbserial-FTWKWI5W"
+        "port": "/dev/cu.usbserial-FTWKWI5W",
+        "cobs": 1
     }, 
     "filename": ""
 }

@@ -69,7 +69,10 @@ def main(argv):
     do_exit = False
     while do_exit == False:
         try:
-            msg = "\rBytes: {0}     Clients: {1}     ".format(serial.received_bytes, server.clientsCount())
+            if serial.records == -1:
+                msg = "\rBytes: {0}     Clients: {1}     ".format(serial.received_bytes, server.clientsCount())
+            else:
+                msg = "\rBytes: {0}     Records: {1}      Clients: {2}     ".format(serial.received_bytes, serial.records, server.clientsCount())
             sys.stdout.write(msg)
             sys.stdout.flush()
             time.sleep(0.1)

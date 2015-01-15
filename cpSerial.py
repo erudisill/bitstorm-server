@@ -21,6 +21,7 @@ class CpSerialSettings():
         self.bytesize = 8
         self.xonxoff = 0
         self.rtscts = 0
+        self.cobs = 0
     
     def __str__(self):
         s =  self.port + " " + str(self.baudrate) + " " + str(self.bytesize) + \
@@ -50,6 +51,7 @@ class CpSerialService(threading.Thread):
             self.ser.bytesize = 8
             self.ser.xonxoff = 0
             self.ser.rtscts = 0
+            self.ser.cobs = 0
         else:
             self.ser.port = settings.port
             self.ser.baudrate = settings.baudrate
@@ -58,10 +60,19 @@ class CpSerialService(threading.Thread):
             self.ser.bytesize = settings.bytesize
             self.ser.xonxoff = settings.xonxoff
             self.ser.rtscts = settings.rtscts
-    
+            self.ser.cobs = settings.cobs
+            
+        self.records = -1
+            
     def run(self):
         
         self.logger.info('starting CpSerialService...')
+        if self.ser.cobs == 1:
+            print('CpSerialSerivce using COBS')
+            self.records = 0
+        else:
+            print('CpSerialSerivice in passthrough mode')
+    
         
         data = bytearray()
         
@@ -70,17 +81,32 @@ class CpSerialService(threading.Thread):
         
         while self.stop_event.is_set() == False:
             
-            # handle incoming data
-            del data[:]
-            if (self.ser.inWaiting() > 0):
-                data.extend(self.ser.read(self.ser.inWaiting()))
-    
-            if len(data) > 0:
-                # log and signal data received
-                self.received_bytes = self.received_bytes + len(data)
-                if self._putData:
-                    # send new copy of data
-                    self._putData(bytearray(data))
+            # non-cobs data just gets passed through as it comes in
+            if self.ser.cobs == 0:
+                del data[:]
+                if (self.ser.inWaiting() > 0):
+                    data.extend(self.ser.read(self.ser.inWaiting()))
+        
+                if len(data) > 0:
+                    # log and signal data received
+                    self.received_bytes = self.received_bytes + len(data)
+                    if self._putData:
+                        # send new copy of data
+                        self._putData(bytearray(data))
+                        
+            # cobs-encoded gets buffered up per 0 record delimeter
+            else:
+                while self.ser.inWaiting() > 0:
+                    c = self.ser.read(1)
+                    #data.append(c)
+                    self.received_bytes = self.received_bytes + 1
+                    if c == '\0':
+                        self.records = self.records + 1
+                        if self._putData:
+                            self._putData(bytearray(data))
+                            del data[:]
+                    else:
+                        data.append(c)
             
             #time.sleep(0.005)
                     
